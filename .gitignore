@@ -1,0 +1,5 @@
+# Image files
+*.jpg
+
+# Image Directories
+*iaps20081-20/*

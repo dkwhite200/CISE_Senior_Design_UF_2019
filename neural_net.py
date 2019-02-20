@@ -46,7 +46,6 @@ with tf.name_scope("eval"):
     accuracy = tf.reduce_mean(tf.cast(correct, tf.float32))
 
 init = tf.global_variables_initializer()
-saver = tf.train.Saver()
 
 from os import walk
 
@@ -68,35 +67,34 @@ def pull_image_fnames(happypath, sadpath):
 
     return image_fnames, image_labels
 
-def _parse_function(filename, label):
+def parse_function(filename, label):
   image_string = tf.read_file(filename)
   image_decoded = tf.image.decode_jpeg(image_string)
   image_resized = tf.image.resize_images(image_decoded, [768, 768])
   return image_resized, label
+
+def parse_tensor_data(X_data, y_data):
+	tensor_data = tf.data.Dataset.from_tensor_slices((X_data, y_data))
+	tensor_data = tensor_data.map(parse_function)
+	tensor_data = tensor_data.shuffle(buffer_size=2000)
+	tensor_data = tensor_data.batch(32)
+	return tensor_data
 
 img_fnames, img_labels = pull_image_fnames("../pics/Happy/", "../pics/Sad/")
 
 from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(img_fnames, img_labels, test_size=.8)
+train_data = parse_tensor_data(X_train, y_train)
+test_data = parse_tensor_data(X_test, y_test)
+train_iterator = train_data.make_one_shot_iterator()
+next_train = train_iterator.get_next()
 
-train_data = tf.data.Dataset.from_tensor_slices((X_train, y_train))
-train_data = train_data.map(_parse_function)
-train_data = train_data.shuffle(buffer_size=2000)
-train_data = train_data.batch(32)
-iterator = train_data.make_initializable_iterator()
-next_element = iterator.get_next()
-test_data = tf.data.Dataset.from_tensor_slices((X_train, y_train))
-test_data = test_data.map(_parse_function)
-test_data = test_data.shuffle(buffer_size=2000)
-test_data = test_data.batch(32)
-
-# use reinitializable to use test and train datasets as iterators.
-
-n_epochs = 400
-
+#Training Phase
 with tf.Session() as sess:
-    init.run()
-    for epoch in range(n_epochs):
-        for iter in range(len(img_fnames) // batch_size):
-	    
+	init.run()
+	for _ in range(400):
+		sess.run(next_train)
+		acc_train = accuracy.eval(train_data)
+		acc_test = accuracy.eval(test_data)
+		print(epoch, "Train accuracy:", acc_train, "Test accuracy", acc_test)

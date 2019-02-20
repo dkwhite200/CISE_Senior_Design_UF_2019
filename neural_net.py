@@ -2,18 +2,73 @@
 
 import numpy as np
 import tensorflow as tf
+from sklearn.model_selection import train_test_split
 from scipy import misc
+from os import walk
+
+# Returns a list of all image file names from the happy and sad image directories
+def pull_image_fnames(happypath, sadpath):
+    image_fnames = []
+    image_labels = []
+
+    for (dirpath, dirnames, filenames) in walk(happypath):
+        image_fnames.extend(filenames)
+        break
+
+    image_labels = [1 for i in range(0, len(image_fnames))]
+
+    for (dirpath, dirnames, filenames) in walk(sadpath):
+        image_fnames.extend(filenames)
+        break
+    length = len(image_fnames) - len(image_labels)
+    image_labels = image_labels + [0 for i in range(0,length)]
+
+    return image_fnames, image_labels
+
+# Returns the image from the file name after resizing
+def parse_function(filename):
+    image_string = tf.read_file(filename)
+    image_decoded = tf.image.decode_jpeg(image_string)
+    image_resized = tf.image.resize_images(image_decoded, [768, 768])
+    return image_resized
+
+# Returns a tf Dataset with 2 lists (images_decoded, labels) in shuffled batches of 32 pairs
+def parse_tensor_data(X_data, y_data):
+    tensor_labels = tf.data.Dataset.from_tensor_slices(y_data)
+    tensor_labels = tensor_labels.batch(50)
+    tensor_data = tf.data.Dataset.from_tensor_slices(X_data)
+    tensor_data = tensor_data.map(parse_function)
+    tesnor_data = tensor_data.batch(50)
+    return tensor_data, tensor_labels
+
+img_fnames, img_labels = pull_image_fnames("../pics/Happy/", "../pics/Sad/")
+
+# Split lists of file names and labels between a training and testing set
+X_train, X_test, y_train, y_test = train_test_split(img_fnames, img_labels, test_size=.8)
+train_data, train_labels = parse_tensor_data(X_train, y_train)
+test_data, test_labels = parse_tensor_data(X_test, y_test)
+
+# Create Iterators for the datasets
+train_dataI = train_data.make_one_shot_iterator()
+train_labelsI = train_labels.make_one_shot_iterator()
+test_dataI = test_data.make_one_shot_iterator()
+test_labelsI = test_labels.make_one_shot_iterator()
 
 n_inputs = 768*768 # Image Size
 n_hidden1 = 300
 n_hidden2 = 100
 n_outputs = 2 # happy or sad
 
+<<<<<<< HEAD
+X = tf.placeholder(tf.float32, shape=(None, n_inputs), name='X')
+y = tf.placeholder(tf.int64, shape=(None), name='y')
+=======
 #creates placeholders that will have data assigned at a later date
 #X saves the information created by passing in images
 X = tf.placeholder(tf.float32, shape=(None, n_inputs), name="X")
 #y saves the value of whether or not the image is happy
 y = tf.placeholder(tf.int64, shape=(None), name="y")
+>>>>>>> 5f8d79082622d7003ce7925e5f512cc8ac9e02cd
 
 #constructs the neural network
 def neuron_layer(X, n_neurons, name, activation=None):
@@ -60,6 +115,8 @@ with tf.name_scope("eval"):
 #creates the initial node to initialize all variables
 init = tf.global_variables_initializer()
 
+<<<<<<< HEAD
+=======
 #method used to generate file names from a directory
 from os import walk
 
@@ -109,12 +166,13 @@ train_data = parse_tensor_data(X_train, y_train)
 test_data = parse_tensor_data(X_test, y_test)
 train_iterator = train_data.make_one_shot_iterator()
 next_train = train_iterator.get_next()
+>>>>>>> 5f8d79082622d7003ce7925e5f512cc8ac9e02cd
 
-#Training Phase
 with tf.Session() as sess:
-	init.run()
-	for _ in range(400):
-		sess.run(next_train)
-		acc_train = accuracy.eval(train_data)
-		acc_test = accuracy.eval(test_data)
-		print(epoch, "Train accuracy:", acc_train, "Test accuracy", acc_test)
+    init.run()
+    for epoch in range(400):
+        train_data_handle = sess.run(train_dataI.string_handle())
+        train_label_handle = sess.run(train_labelsI.string_handle())
+        sess.run(training_op, feed_dict={X: train_data_handle, y: train_label_handle})
+        acc_train = accuracy.eval(feed_dict={X: X_batch, y: y_batch})
+    print(epoch, "Train Accuracy: ", acc_train)

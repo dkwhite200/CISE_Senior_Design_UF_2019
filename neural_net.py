@@ -166,7 +166,6 @@ train_data = parse_tensor_data(X_train, y_train)
 test_data = parse_tensor_data(X_test, y_test)
 train_iterator = train_data.make_one_shot_iterator()
 next_train = train_iterator.get_next()
->>>>>>> 5f8d79082622d7003ce7925e5f512cc8ac9e02cd
 
 with tf.Session() as sess:
     init.run()

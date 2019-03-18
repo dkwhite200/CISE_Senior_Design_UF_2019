@@ -59,16 +59,13 @@ n_hidden1 = 300
 n_hidden2 = 100
 n_outputs = 2 # happy or sad
 
-<<<<<<< HEAD
 X = tf.placeholder(tf.float32, shape=(None, n_inputs), name='X')
 y = tf.placeholder(tf.int64, shape=(None), name='y')
-=======
 #creates placeholders that will have data assigned at a later date
 #X saves the information created by passing in images
 X = tf.placeholder(tf.float32, shape=(None, n_inputs), name="X")
 #y saves the value of whether or not the image is happy
 y = tf.placeholder(tf.int64, shape=(None), name="y")
->>>>>>> 5f8d79082622d7003ce7925e5f512cc8ac9e02cd
 
 #constructs the neural network
 def neuron_layer(X, n_neurons, name, activation=None):

@@ -112,8 +112,6 @@ with tf.name_scope("eval"):
 #creates the initial node to initialize all variables
 init = tf.global_variables_initializer()
 
-<<<<<<< HEAD
-=======
 #method used to generate file names from a directory
 from os import walk
 

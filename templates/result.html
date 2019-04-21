@@ -1,20 +1,21 @@
+<!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <title>I-MOTION BOT</title>
-    <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
-</head>
+    <head>
+        <title>I-MOTION BOT</title>
+        <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
+    </head>
 
-<body>
-    <div class="main">
-        <h1>I-MOTION BOT</h1>
-        <div class="container">
-            <h4>This image makes the I-MOTION BOT feel: </h4>
-            <h2>{{result}}</h2>
-            <p>The I-MOTION BOT is {{confidence}}% confident that the above emotion is how it feels.</p>
-            <input type="button" value="Back" onclick="window.history.back()" />
+    <body>
+        <div class="main">
+            <h1>I-MOTION BOT</h1>
+            <div class="container">
+                <h4>This image makes the I-MOTION BOT feel: </h4>
+                <h2>{{result}}</h2>
+                <p>The I-MOTION BOT is {{confidence}}% confident that the above emotion is how it feels.</p>
+                <input type="button" value="Back" onclick="window.history.back()" />
+            </div>
         </div>
-        <div>
-</body>
+    </body>
 
 </html>

@@ -122,47 +122,14 @@ def index():
        top_k = results.argsort()[-5:][::-1]
        labels = load_labels(label_file)
 
-       out = {labels[top_k[0]]:str(results[top_k[0]]),labels[top_k[1]]:str(results[top_k[1]])}
+       conf = str(100 * results[top_k[0]])[0:5]
+       res = labels[top_k[0]]
+       res = res.upper()
        cleanup(file_name)
-       return jsonify(out)
+       return render_template("result.html", result=res, confidence=conf)
 
-    return  '''
-    <!doctype html>
-    <html lang="en">
-    <head>
-      <title>Running my first AI Demo</title>
-    </head>
-    <body>
-    <div class="site-wrapper">
-        <div class="cover-container">
-            <nav id="main">
-                <a href="http://localhost:5000/demo" >HOME</a>
-            </nav>
-          <div class="inner cover">
-
-          </div>
-          <div class="mastfoot">
-          <hr />
-            <div class="container">
-              <div style="margin-top:5%">
-	            <h1 style="color:black">Happy Sad Classification Demo</h1>
-	            <h4 style="color:black">Upload new Image </h4>
-	            <form method=post enctype=multipart/form-data>
-	                 <p><input type=file name=file>
-        	        <input type=submit style="color:black;" value=Upload>
-	            </form>
-	            </div>
-            </div>
-        	</div>
-     </div>
-   </div>
-</body>
-</html>
-
-    '''
+    return render_template("base.html")
 
 app.graph=load_graph('./win-test.pb')
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=int("5000"), debug=True, use_reloader=False)
-
-
